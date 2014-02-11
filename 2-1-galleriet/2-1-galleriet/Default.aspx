@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="_2_1_galleriet.Default" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="_2_1_galleriet.Default" ViewStateMode="Disabled"%>
 
 <!DOCTYPE html>
 
@@ -18,12 +18,22 @@
             <asp:ValidationSummary ID="ValidationSummary1" runat="server" CssClass="error" />
             <%-- Huvudbild --%>
             <div>
-                <img src="Content/img/Koala.jpg" alt="KOALA" />
+                <img src="Content\img\Koala.jpg" alt="KOALA" />
             </div>
             <%-- ThumbnailPanel --%>
-            <asp:Panel ID="ThumbnailPanel" runat="server">
+            <asp:Panel ID="ThumbnailPanel" CssClass="ThumbnailDiv" runat="server">
+                <asp:Repeater ID="Repeater" runat="server" ItemType="_2_1_galleriet.Model.GalleryImage" SelectMethod="Repeater_GetData">
+                <ItemTemplate>
+                    <%--<img src="Content/img/Koala.jpg" />--%>
+                    <asp:HyperLink ID="HyperLink" runat="server"><asp:Image ID="Image" runat="server" ImageUrl='<%# Item.ImgPath %>' /> </asp:HyperLink>
+                </ItemTemplate>
+                </asp:Repeater>
             </asp:Panel>
 
+            <asp:Panel ID="UpLoadPanel" runat="server">
+                <asp:FileUpload ID="FileUpload" runat="server" />
+            </asp:Panel>
+            
             <%-- Footer --%>
             <p class="footer">
                 Anton Ledström
