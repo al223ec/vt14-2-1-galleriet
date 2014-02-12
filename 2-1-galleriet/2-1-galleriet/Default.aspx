@@ -24,8 +24,7 @@
             <asp:Panel ID="ThumbnailPanel" CssClass="ThumbnailDiv" runat="server">
                 <asp:Repeater ID="Repeater" runat="server" ItemType="_2_1_galleriet.Model.GalleryImage" SelectMethod="Repeater_GetData">
                 <ItemTemplate>
-                    <%--<img src="Content/img/Koala.jpg" />--%>
-                    <asp:HyperLink ID="HyperLink" runat="server"><asp:Image ID="Image" runat="server" ImageUrl='<%# Item.ImgPath %>' /> </asp:HyperLink>
+                    <asp:HyperLink ID="HyperLink" runat="server"><asp:Image ID="Image" runat="server" ImageUrl='<%# Item.Name %>'/> </asp:HyperLink>
                 </ItemTemplate>
                 </asp:Repeater>
             </asp:Panel>
