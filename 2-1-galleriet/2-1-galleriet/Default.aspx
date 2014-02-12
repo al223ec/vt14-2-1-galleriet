@@ -1,5 +1,5 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="_2_1_galleriet.Default" ViewStateMode="Disabled"%>
-
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="_2_1_galleriet.Default" ViewStateMode="Disabled" Trace="true"%>
+ 
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -18,13 +18,13 @@
             <asp:ValidationSummary ID="ValidationSummary1" runat="server" CssClass="error" />
             <%-- Huvudbild --%>
             <div>
-                <img src="Content\img\Koala.jpg" alt="KOALA" />
+                <asp:Image ID="MainImage" runat="server" visible="false"/>
             </div>
             <%-- ThumbnailPanel --%>
             <asp:Panel ID="ThumbnailPanel" CssClass="ThumbnailDiv" runat="server">
-                <asp:Repeater ID="Repeater" runat="server" ItemType="_2_1_galleriet.Model.GalleryImage" SelectMethod="Repeater_GetData">
+                <asp:Repeater ID="Repeater" runat="server" ItemType="_2_1_galleriet.Model.GalleryImage" SelectMethod="Repeater_GetData" OnItemDataBound="Repeater_ItemDataBound">
                 <ItemTemplate>
-                    <asp:HyperLink ID="HyperLink" runat="server"><asp:Image ID="Image" runat="server" ImageUrl='<%# Item.Name %>'/> </asp:HyperLink>
+                    <asp:HyperLink ID="HyperLink" runat="server"><asp:Image ID="Image" runat="server" ImageUrl='<%# Item.ImgPath%>'/> </asp:HyperLink>
                 </ItemTemplate>
                 </asp:Repeater>
             </asp:Panel>
