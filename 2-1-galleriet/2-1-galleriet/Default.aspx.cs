@@ -10,7 +10,9 @@ namespace _2_1_galleriet
 {
     public partial class Default : System.Web.UI.Page
     {
-        private Gallery Gallery { get { return Session["Gallery"] as Gallery ?? (Session["Gallery"] = new Gallery()) as Gallery; } } //Infinite loop om om inte session objektet kan castas
+       // private Gallery Gallery { get { return Session["Gallery"] as Gallery ?? (Session["Gallery"] = new Gallery()) as Gallery; } } //Infinite loop om om inte session objektet kan castas
+        private Gallery _gallery;
+        private Gallery Gallery { get { return _gallery ?? (_gallery = new Gallery());  } }
 
         protected void Page_Load(object sender, EventArgs e)
         {
