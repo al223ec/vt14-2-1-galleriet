@@ -10,7 +10,6 @@ namespace _2_1_galleriet
 {
     public partial class Default : System.Web.UI.Page
     {
-       // private Gallery Gallery { get { return Session["Gallery"] as Gallery ?? (Session["Gallery"] = new Gallery()) as Gallery; } } //Infinite loop om om inte session objektet kan castas
         private Gallery _gallery;
         private Gallery Gallery { get { return _gallery ?? (_gallery = new Gallery());  } }
 
@@ -45,19 +44,22 @@ namespace _2_1_galleriet
 
         protected void UploadButton_Click(object sender, EventArgs e)
         {
+            Validate();
+            if (!IsValid)
+            {
+                return;
+            }
             if (FileUploader.PostedFile.ContentLength != 0)
             {
                 try
                 {
-                //kontrollera filen
-                Gallery.SaveImage(FileUploader.PostedFile.InputStream, FileUploader.PostedFile.FileName);
-                Page_Load(sender, e);
+                    //kontrollera filen ?? 
+                    Gallery.SaveImage(FileUploader.PostedFile.InputStream, FileUploader.PostedFile.FileName);
+                    Page_Load(sender, e);
 
-                SuccessFullUploadPanel.Visible = true;
-                SuccessFullUploadPanel.CssClass = "success"; 
-                OutputLiteral.Text = "Bilden laddades upp";
-
-
+                    SuccessFullUploadPanel.Visible = true;
+                    SuccessFullUploadPanel.CssClass = "success"; 
+                    OutputLiteral.Text = "Bilden laddades upp";
                 }
                 catch (Exception ex)
                 {

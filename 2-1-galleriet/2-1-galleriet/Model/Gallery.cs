@@ -12,25 +12,35 @@ namespace _2_1_galleriet.Model
     {
         private static readonly Regex ApprovedExtensions, SanitizePath;
         private static readonly string PhysicalUploadedImagesPath;
-
-        public Dictionary<string, GalleryImage> DictImages { get; set; }
+        
+        private static Dictionary<string, GalleryImage> _dictImages;
+        
+        public IReadOnlyDictionary<string, GalleryImage> DictImages { get { return _dictImages as IReadOnlyDictionary<string, GalleryImage>; } }
 
         static Gallery()
         {
             ApprovedExtensions = new Regex("(.jpg|.gif|.png)", RegexOptions.IgnoreCase);
             var invalidChars = new string(Path.GetInvalidFileNameChars());
+
             SanitizePath = new Regex(string.Format("[{0}]", Regex.Escape(invalidChars)));
             PhysicalUploadedImagesPath = Path.Combine(AppDomain.CurrentDomain.GetData("APPBASE").ToString(), @"Content\img");
+
+            _dictImages = new Dictionary<string, GalleryImage>();
+            InitGallery();
         }
 
-        public Gallery()
+        private static void InitGallery()
         {
-            DictImages = GetImagesAsDictionary();
+            var di = new DirectoryInfo(PhysicalUploadedImagesPath);
+            foreach (var info in di.GetFiles())
+            {
+                AddImage(info as FileInfo);
+            }
         }
 
         public void CreateThumbNails()
         {
-            foreach (var item in DictImages.Values)
+            foreach (var item in _dictImages.Values)
             {
                 if (!File.Exists(item.ThumbFullPath))
                 {
@@ -40,61 +50,102 @@ namespace _2_1_galleriet.Model
                 }
             }
         }
-
-        private Dictionary<string, GalleryImage> GetImagesAsDictionary()
-        {
-            var di = new DirectoryInfo(PhysicalUploadedImagesPath);
-            var dict = new Dictionary<string, GalleryImage>();
-
-            foreach (var info in di.GetFiles())
-            {
-                dict.Add(info.Name, new GalleryImage
-                {
-                    Name = info.Name,
-                    FullPath = info.FullName,
-                });
-            }
-            return dict;
-        }
-
         public void SaveImage(Stream stream, string filename)
         {
-            var newImage = Image.FromStream(stream);
-            var path = Path.Combine(PhysicalUploadedImagesPath, filename);
-            var numOfExistingImages = 1;
-
-            while (File.Exists(path))
+            if (ApprovedExtensions.IsMatch(filename))
             {
-                path = Path.Combine(PhysicalUploadedImagesPath, string.Format("{0}{1}{2}", Path.GetFileNameWithoutExtension(path), numOfExistingImages.ToString(), Path.GetExtension(path)));
-                numOfExistingImages++;
-            }
-            newImage.Save(path);
+                var newImage = Image.FromStream(stream);
+                if (IsValidImage(newImage))
+                {
+                    var imageName = Path.GetFileNameWithoutExtension(filename);
+                    var path = Path.Combine(PhysicalUploadedImagesPath, filename);
+                    var numOfExistingImages = 1;
 
-            var file = new FileInfo(path);
-            DictImages.Add(
+                    while (File.Exists(path))
+                    {
+                        path = Path.Combine(PhysicalUploadedImagesPath, string.Format("{0}{1}{2}", imageName, string.Format("({0})", numOfExistingImages), Path.GetExtension(path)));
+                        numOfExistingImages++;
+                    }
+                    newImage.Save(path);
+                    AddImage(new FileInfo(path));
+                }
+                else
+                {
+                    throw new ArgumentException("Bilden är inte i några av dom tillåtna formaten, GIF, PNG eller JPEG"); 
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Filen verkar inte ha en godkänd filändelse"); 
+            }
+        }
+        //Kan jag ha denna statisk?? 
+        private static void AddImage(FileInfo file)
+        {
+            _dictImages.Add(
                 file.Name, new GalleryImage
                 {
                     Name = file.Name,
                     FullPath = file.FullName,
                 });
         }
-        public void AddImage()
-        {
-            //DictImages.Add();
-        }
+
         public GalleryImage GetImage(string name)
         {
-            throw new NotImplementedException();
+            if (ImageExists(name))
+            {
+                return _dictImages[name];
+            }
+            else
+            {
+                //throw new ArgumentException(string.Format("{0} Finns inte i listan", name));
+                return null;
+            }
         }
+
+        private static bool IsValidImage(Image image)
+        {
+            return image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Gif.Guid ||
+                    image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Jpeg.Guid ||
+                    image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Png.Guid;
+        }
+
         public void DeleteImage(string name)
         {
-            DictImages.Remove(name);
+            _dictImages.Remove(name);
         }
         public bool ImageExists(string name)
         {
-            //return File.Exists(Path.Combine(PhysicalUploadedImagesPath, name));
-            return DictImages.ContainsKey(name);
+            return _dictImages.ContainsKey(name);
         }
+
+        //public Gallery()
+        //{
+        //    DictImages = new Dictionary<string, GalleryImage>(100);
+        //    var di = new DirectoryInfo(PhysicalUploadedImagesPath);
+        //    foreach (var info in di.GetFiles())
+        //    {
+        //        AddImage(info as FileInfo);
+        //    }
+        //}
+        //private void GetImagesAsDictionary()
+        //{
+        //    DictImages = new Dictionary<string, GalleryImage>(100);
+
+        //    var di = new DirectoryInfo(PhysicalUploadedImagesPath);
+        //    //var dict = new Dictionary<string, GalleryImage>();
+
+        //    foreach (var info in di.GetFiles())
+        //    {
+        //        AddImage(info as FileInfo); 
+        //        //dict.Add(info.Name, new GalleryImage
+        //        //{
+        //        //    Name = info.Name,
+        //        //    FullPath = info.FullName,
+        //        //});
+        //    }
+        //   // return dict;
+        //}
 
         //foreach (var item in Images)
         //{
@@ -133,5 +184,7 @@ namespace _2_1_galleriet.Model
         //                ThumbImgFullPath = string.Format("{0}/thumb/{1}",fi.DirectoryName, fi.Name),
         //            }).AsEnumerable();
         //}
+
+
     }
 }

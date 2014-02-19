@@ -31,13 +31,40 @@ namespace _2_1_galleriet {
         protected global::System.Web.UI.WebControls.Panel MainPanel;
         
         /// <summary>
-        /// ValidationSummary1 control.
+        /// SuccessFullUploadPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ValidationSummary ValidationSummary1;
+        protected global::System.Web.UI.WebControls.Panel SuccessFullUploadPanel;
+        
+        /// <summary>
+        /// OutputLiteral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal OutputLiteral;
+        
+        /// <summary>
+        /// CloseUploadButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button CloseUploadButton;
+        
+        /// <summary>
+        /// ValidationSummary control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ValidationSummary ValidationSummary;
         
         /// <summary>
         /// MainImage control.
@@ -94,21 +121,21 @@ namespace _2_1_galleriet {
         protected global::System.Web.UI.WebControls.Button UploadButton;
         
         /// <summary>
-        /// SuccessFullUploadPanel control.
+        /// RequiredFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel SuccessFullUploadPanel;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator;
         
         /// <summary>
-        /// OutputLiteral control.
+        /// RegularExpressionValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal OutputLiteral;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator;
     }
 }
