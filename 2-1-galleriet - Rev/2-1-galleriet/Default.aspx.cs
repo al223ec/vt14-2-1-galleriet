@@ -60,7 +60,7 @@ namespace _2_1_galleriet
             {
                 try
                 {
-                    //kontrollera filen ?? 
+                    //kontrollera filen ??
                     Response.Redirect(string.Format("?name={0}&upload={1}", Gallery.SaveImage(FileUploader.PostedFile.InputStream, FileUploader.PostedFile.FileName), true));
                 }
                 catch (Exception ex)
