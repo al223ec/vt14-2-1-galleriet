@@ -22,8 +22,8 @@ namespace _2_1_galleriet.Model
 
         static GalleryImage()
         {
-            _imgPath = "Content/img/";
-            _thumbPath = "Content/img/thumb/";
+            _imgPath = "~/Content/img/";
+            _thumbPath = "~/Content/img/thumb/";
         }
 
     }

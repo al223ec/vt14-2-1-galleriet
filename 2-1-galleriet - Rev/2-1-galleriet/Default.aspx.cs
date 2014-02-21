@@ -24,11 +24,12 @@ namespace _2_1_galleriet
                     MainImage.Visible = true;
                 }
             }
-            if (Request.QueryString["upload"] != null)
+            if (Session["upload"] != null) 
             {
                 SuccessFullUploadPanel.Visible = true;
                 SuccessFullUploadPanel.CssClass = "success";
                 OutputLiteral.Text = "Bilden laddades upp";
+                Session.Remove("upload"); 
             }
 
             Gallery.CreateThumbNails();
@@ -36,7 +37,7 @@ namespace _2_1_galleriet
 
         public IEnumerable<Model.GalleryImage> Repeater_GetData()
         {
-            return from entry in Gallery.DictImages.Values select entry;
+            return Gallery.DictImages.Values;
         }
 
         protected void Repeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -60,8 +61,8 @@ namespace _2_1_galleriet
             {
                 try
                 {
-                    //kontrollera filen ??
-                    Response.Redirect(string.Format("?name={0}&upload={1}", Gallery.SaveImage(FileUploader.PostedFile.InputStream, FileUploader.PostedFile.FileName), true));
+                    Session["upload"] = true;  
+                    Response.Redirect(string.Format("?name={0}", Gallery.SaveImage(FileUploader.PostedFile.InputStream, FileUploader.PostedFile.FileName)));
                 }
                 catch (Exception ex)
                 {
@@ -71,5 +72,28 @@ namespace _2_1_galleriet
                 }
             }
         }
+
+        //protected void CloseUploadButton_Click(object sender, EventArgs e)
+        //{
+        //     Response.Redirect(RemoveQueryStringByKey(HttpContext.Current.Request.Url.AbsoluteUri, "upload")); 
+        //}
+        ////http://stackoverflow.com/questions/11052744/how-to-efficiently-remove-a-query-string-by-key-from-a-url
+        //public static string RemoveQueryStringByKey(string url, string key)
+        //{
+        //    var uri = new Uri(url);
+
+        //    // this gets all the query string key value pairs as a collection
+        //    var newQueryString = HttpUtility.ParseQueryString(uri.Query);
+
+        //    // this removes the key if exists
+        //    newQueryString.Remove(key);
+
+        //    // this gets the page path from root without QueryString
+        //    string pagePathWithoutQueryString = uri.GetLeftPart(UriPartial.Path);
+
+        //    return newQueryString.Count > 0
+        //        ? String.Format("{0}?{1}", pagePathWithoutQueryString, newQueryString)
+        //        : pagePathWithoutQueryString;
+        //}
     }
 }

@@ -5,28 +5,35 @@ using System.Web;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Drawing;
+using System.Web.Caching;
 
 namespace _2_1_galleriet.Model
 {
     public class Gallery
     {
-        private static readonly Regex ApprovedExtensions;
-        //private static readonly Regex SanitizePath;
+        private static readonly Regex ApprovedExtensions, SanitizePath;
+
         private static readonly string PhysicalUploadedImagesPath;
         
         private static Dictionary<string, GalleryImage> _dictImages;
-        
-        public IReadOnlyDictionary<string, GalleryImage> DictImages { get { return _dictImages as IReadOnlyDictionary<string, GalleryImage>; } }
+
+        public static IReadOnlyDictionary<string, GalleryImage> DictImages { get { return HttpContext.Current.Cache["GalleryImages"] as IReadOnlyDictionary<string, GalleryImage>; } }
+
+        //public IReadOnlyDictionary<string, GalleryImage> DictImages { get { return _dictImages as IReadOnlyDictionary<string, GalleryImage>; } }
+
         static Gallery()
         {
             ApprovedExtensions = new Regex("(.jpg|.gif|.png)", RegexOptions.IgnoreCase);
             var invalidChars = new string(Path.GetInvalidFileNameChars());
 
-        //    SanitizePath = new Regex(string.Format("[{0}]", Regex.Escape(invalidChars)));
+            SanitizePath = new Regex(string.Format("[{0}]", Regex.Escape(invalidChars)));
             PhysicalUploadedImagesPath = Path.Combine(AppDomain.CurrentDomain.GetData("APPBASE").ToString(), @"Content\img");
 
-            _dictImages = new Dictionary<string, GalleryImage>();
+            var allImages = _dictImages = new Dictionary<string, GalleryImage>();
+
             InitGallery();
+
+            HttpContext.Current.Cache["GalleryImages"] = allImages; 
         }
 
         private static void InitGallery()
@@ -51,19 +58,22 @@ namespace _2_1_galleriet.Model
 
         public void CreateThumbNails()
         {
-            foreach (var item in _dictImages.Values)
+            foreach (var galleryImage in _dictImages.Values)
             {
-                if (!File.Exists(item.ThumbFullPath))
+                if (!File.Exists(galleryImage.ThumbFullPath))
                 {
-                    var thumbnail = System.Drawing.Image.FromFile(item.FullPath).GetThumbnailImage(60, 45, null, System.IntPtr.Zero);
-                    thumbnail.Save(item.ThumbFullPath);
+                    var thumbnail = System.Drawing.Image.FromFile(galleryImage.FullPath).GetThumbnailImage(60, 45, null, System.IntPtr.Zero);
+                    thumbnail.Save(galleryImage.ThumbFullPath);
                 }
             }
         }
+
         public string SaveImage(Stream stream, string filename)
         {
             if (ApprovedExtensions.IsMatch(filename))
             {
+                filename = SanitizePath.Replace(filename, string.Empty); 
+
                 var newImage = Image.FromStream(stream); //Kastas ett undatag om filen som laddas upp inte är en bild
                 if (IsValidImage(newImage))
                 {
@@ -79,6 +89,7 @@ namespace _2_1_galleriet.Model
                     newImage.Save(path);
                     var fileInfo = new FileInfo(path); 
                     AddImage(fileInfo);
+
                     return fileInfo.Name; 
                 }
                 else
@@ -91,19 +102,6 @@ namespace _2_1_galleriet.Model
                 throw new ArgumentException("Filen verkar inte ha en godkänd filändelse"); 
             }
         }
-
-        //public GalleryImage GetImage(string name)
-        //{
-        //    if (ImageExists(name))
-        //    {
-        //        return _dictImages[name];
-        //    }
-        //    else
-        //    {
-        //        //throw new ArgumentException(string.Format("{0} Finns inte i listan", name));
-        //        return null;
-        //    }
-        //}
 
         private static bool IsValidImage(Image image)
         {
@@ -120,6 +118,19 @@ namespace _2_1_galleriet.Model
         {
             return _dictImages.ContainsKey(name);
         }
+
+        //public GalleryImage GetImage(string name)
+        //{
+        //    if (ImageExists(name))
+        //    {
+        //        return _dictImages[name];
+        //    }
+        //    else
+        //    {
+        //        //throw new ArgumentException(string.Format("{0} Finns inte i listan", name));
+        //        return null;
+        //    }
+        //}
 
         //public Gallery()
         //{
@@ -186,7 +197,5 @@ namespace _2_1_galleriet.Model
         //                ThumbImgFullPath = string.Format("{0}/thumb/{1}",fi.DirectoryName, fi.Name),
         //            }).AsEnumerable();
         //}
-
-
     }
 }
